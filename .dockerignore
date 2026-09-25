@@ -1,0 +1,15 @@
+node_modules
+.next
+data
+.env
+.env.*
+!.env.example
+fixtures
+tests
+coverage
+*.tsbuildinfo
+.git
+Dockerfile
+docker-compose.yml
+secrets
+*service-account*.json

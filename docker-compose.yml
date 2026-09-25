@@ -1,0 +1,41 @@
+services:
+  web:
+    build:
+      context: .
+      target: web
+    env_file: .env
+    environment:
+      DATABASE_URL: file:/data/unibg.db
+      GOOGLE_SERVICE_ACCOUNT_KEY_FILE: /run/secrets/google_service_account
+    secrets:
+      - google_service_account
+    volumes:
+      - unibg-data:/data
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      target: worker
+    env_file: .env
+    environment:
+      DATABASE_URL: file:/data/unibg.db
+      GOOGLE_SERVICE_ACCOUNT_KEY_FILE: /run/secrets/google_service_account
+    secrets:
+      - google_service_account
+    volumes:
+      - unibg-data:/data
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy # web applies the migrations first
+
+# The key never enters the image: it is mounted read-only at /run/secrets/google_service_account.
+secrets:
+  google_service_account:
+    file: ./secrets/google-service-account.json
+
+volumes:
+  unibg-data:
